@@ -2,14 +2,18 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os.path
-
+import json
 
 if __name__ == '__main__':
     
+    # load configuration
+    with open("../coin_config.json", "r") as json_file:
+        config_data = json.load(json_file)
+
     # binanace staking page url
-    url = "https://www.binance.com/en/pos"
+    url = config_data["url"]["staking"]
     # staking condition monitor
-    staking_monitor = {"TRX" : ["30", "60", "90"], "ADA" : ["60", "90"]}
+    staking_monitor = config_data["coin_monitor"]
 
     # selenium params
     CHECKBOX_CLICK_DELAY = 2
