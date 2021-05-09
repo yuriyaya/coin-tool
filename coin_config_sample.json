@@ -1,0 +1,12 @@
+{
+    "coin_monitor":{
+        "TRX":["30", "60", "90"],
+        "ADA":["60", "90"]
+    },
+    "url":{
+        "staking":"https://www.binance.com/en/pos"
+    },
+    "telegram":{
+        "token":"xxx"
+    }
+}
