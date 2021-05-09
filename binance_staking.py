@@ -42,16 +42,17 @@ for coin, due in staking_monitor.items():
                     due_found = True
                     button_tag.click()
                     staking_earn_rate = driver.find_element_by_class_name("css-1v55uij")
-                    print("duration:", button_tag.text, ", Est. APY:", staking_earn_rate.text)
+                    print("Duration:", button_tag.text, ", Est. APY:", staking_earn_rate.text)
                     if not os.path.isfile(alarm_file_name):
                         f = open(alarm_file_name, "x") # create alarm file
                         f.close()
             if due_found is False:
-                print("monitoring duration", due_item, "is not available now")
+                print(coin, due_item, "sold out")
                 if os.path.exists(alarm_file_name):
                     os.remove(alarm_file_name) # delete alarm file
         else:
-            print(coin, due_item, "staking not available")
+            print(coin, "staking sold out")
             if os.path.exists(alarm_file_name):
-                    os.remove(alarm_file_name) # delete alarm file
+                os.remove(alarm_file_name) # delete alarm file
+            exit
 
