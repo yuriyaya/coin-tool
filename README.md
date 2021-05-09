@@ -4,3 +4,4 @@ monitor binance staking availability
 ### python package dependency
 - pip install selenium
 - pip install webdriver-manager
+- pip install python-telegram-bot
