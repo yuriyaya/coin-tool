@@ -21,7 +21,7 @@ def send_multiple_telegram_alarm(bot, chat_id_list, msg):
 if __name__ == '__main__':
     
     # load configuration
-    # with open("/homebitnami/htdocs/coin_config.json", "r") as json_file:
+    # with open("/home/bitnami/htdocs/coin_config.json", "r") as json_file:
     with open("../coin_config.json", "r") as json_file:
         config_data = json.load(json_file)
 
@@ -96,4 +96,5 @@ if __name__ == '__main__':
                     os.remove(alarm_file_name) # delete alarm file
                     send_multiple_telegram_alarm(bot, chat_id_list, coin + " " + due_item + " staking sold out!")
                 
+    driver.quit()
 
