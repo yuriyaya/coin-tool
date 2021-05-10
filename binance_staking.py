@@ -11,12 +11,17 @@ import telegram
 def send_telegram_alarm(bot, chat_id, msg):
     bot.send_message(chat_id=chat_id, parse_mode='HTML', text=msg)
 
+def send_multiple_telegram_alarm(bot, chat_id_list, msg):
+    for chat_id in chat_id_list:
+        bot.send_message(chat_id=chat_id, parse_mode='HTML', text=msg)
+
 # =========================================================================================
 # MAIN
 # =========================================================================================
 if __name__ == '__main__':
     
     # load configuration
+    # with open("/homebitnami/htdocs/coin_config.json", "r") as json_file:
     with open("../coin_config.json", "r") as json_file:
         config_data = json.load(json_file)
 
@@ -26,7 +31,7 @@ if __name__ == '__main__':
     staking_monitor = config_data["coin_monitor"]
     # telegram token
     tele_token = config_data["telegram"]["token"]
-    chat_id = config_data["telegram"]["chat_id"]
+    chat_id_list = config_data["telegram"]["chat_id"]
 
     # telegram alarm bot setting
     bot = telegram.Bot(token=tele_token)
@@ -38,7 +43,9 @@ if __name__ == '__main__':
     # web driver setting
     options = webdriver.ChromeOptions()
     options.add_argument('headless')
-    options.add_experimental_option("excludeSwitches", ["enable-logging"])
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-setuid-sandbox')
+    # options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.maximize_window()
@@ -75,18 +82,18 @@ if __name__ == '__main__':
                             f = open(alarm_file_name, "x") # create alarm file
                             f.close()
                             alarm_msg_new_staking = "New staking available!\n" + coin + "\n" + msg
-                            send_telegram_alarm(bot, chat_id, alarm_msg_new_staking)
+                            send_multiple_telegram_alarm(bot, chat_id_list, alarm_msg_new_staking)
                 if due_found is False:
                     print(coin, due_item, "sold out")
                     if os.path.exists(alarm_file_name):
                         os.remove(alarm_file_name) # delete alarm file
-                        send_telegram_alarm(bot, chat_id, coin + " " + due_item + " staking sold out!")
+                        send_multiple_telegram_alarm(bot, chat_id_list, coin + " " + due_item + " staking sold out!")
             else:
                 # monitoring coin staking available, no search result
                 # need to check other duration, no exit at here
                 print(coin, due_item, "sold out")
                 if os.path.exists(alarm_file_name):
                     os.remove(alarm_file_name) # delete alarm file
-                    send_telegram_alarm(bot, chat_id, coin + " " + due_item + " staking sold out!")
+                    send_multiple_telegram_alarm(bot, chat_id_list, coin + " " + due_item + " staking sold out!")
                 
 
