@@ -1,5 +1,6 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from pyvirtualdisplay import Display
 import time
 import os.path
 import json
@@ -20,10 +21,16 @@ def send_multiple_telegram_alarm(bot, chat_id_list, msg):
 # =========================================================================================
 if __name__ == '__main__':
     
+    PLATFORM = "SERVER"
+    PLATFORM = "LOCAL"
+
     # load configuration
-    # with open("/home/bitnami/htdocs/coin_config.json", "r") as json_file:
-    with open("../coin_config.json", "r") as json_file:
-        config_data = json.load(json_file)
+    if PLATFORM == "SERVER":
+        with open("/home/bitnami/htdocs/coin_config.json", "r") as json_file:
+            config_data = json.load(json_file)
+    else:
+        with open("../coin_config.json", "r") as json_file:
+            config_data = json.load(json_file)
 
     # binanace staking page url
     url = config_data["url"]["staking"]
@@ -42,10 +49,14 @@ if __name__ == '__main__':
 
     # web driver setting
     options = webdriver.ChromeOptions()
-    options.add_argument('headless')
+    options.add_argument('--headless')
     options.add_argument('--no-sandbox')
-    options.add_argument('--disable-setuid-sandbox')
-    # options.add_experimental_option("excludeSwitches", ["enable-logging"])
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+
+    if PLATFORM == "SERVER":
+        display = Display(visible=0, size=(1024,768))
+        display.start()
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.maximize_window()
@@ -64,7 +75,8 @@ if __name__ == '__main__':
         time.sleep(INPUT_SEARCH_DELAY)
         staking_coins = driver.find_elements_by_class_name("css-1lxsrr9")
         for due_item in due:
-            print("- Check", coin, due_item)
+            if PLATFORM == "LOCAL":
+                print("- Check", coin, due_item)
             alarm_file_name = coin + "_" + due_item
             if len(staking_coins) > 0:
                 # monitoring coin staking available
@@ -76,22 +88,25 @@ if __name__ == '__main__':
                         due_found = True
                         button_tag.click()
                         staking_earn_rate = driver.find_element_by_class_name("css-1v55uij")
-                        msg = "Duration: " + button_tag.text + ", Est. APY: " + staking_earn_rate.text
-                        print(msg)
+                        if PLATFORM == "LOCAL":
+                            msg = "Duration: " + button_tag.text + ", Est. APY: " + staking_earn_rate.text
+                            print(msg)
                         if not os.path.isfile(alarm_file_name):
                             f = open(alarm_file_name, "x") # create alarm file
                             f.close()
                             alarm_msg_new_staking = "New staking available!\n" + coin + "\n" + msg
                             send_multiple_telegram_alarm(bot, chat_id_list, alarm_msg_new_staking)
                 if due_found is False:
-                    print(coin, due_item, "sold out")
+                    if PLATFORM == "LOCAL":
+                        print(coin, due_item, "sold out")
                     if os.path.exists(alarm_file_name):
                         os.remove(alarm_file_name) # delete alarm file
                         send_multiple_telegram_alarm(bot, chat_id_list, coin + " " + due_item + " staking sold out!")
             else:
                 # monitoring coin staking available, no search result
                 # need to check other duration, no exit at here
-                print(coin, due_item, "sold out")
+                if PLATFORM == "LOCAL":
+                    print(coin, due_item, "sold out")
                 if os.path.exists(alarm_file_name):
                     os.remove(alarm_file_name) # delete alarm file
                     send_multiple_telegram_alarm(bot, chat_id_list, coin + " " + due_item + " staking sold out!")
