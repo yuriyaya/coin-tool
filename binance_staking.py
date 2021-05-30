@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # page loading
     driver.get(url)
 
-    driver.find_element_by_class_name("css-ou20q0").click() # click available checkbox
+    driver.find_element_by_xpath('//*[@id="__APP"]/div/main/div/div[3]/div/div[1]/label/div[1]').click() # click available checkbox
     time.sleep(CHECKBOX_CLICK_DELAY)
 
     for coin, due in staking_monitor.items():
